@@ -1,0 +1,23 @@
+#!/bin/bash
+HOST_PAK_CFG=/usr/bin/pkg-config
+
+if [ ! $SYSROOT ]; then
+	echo "Please make sure you are in cross-compile environment."
+	exit 1
+fi
+
+$HOST_PAK_CFG --exists $*
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+SYSRT=$(echo $SYSROOT | sed 's/\//\\\//g')
+
+if $HOST_PAK_CFG $* | sed -e "s/-I/-I${SYSRT}/g" \
+	-e "s/-L/-L${SYSRT}/g" \
+	-e "s/\([[:space:]][[:space:]]*\)\//\1${SYSRT}\//g" \
+	-e "s/^\//${SYSRT}\//g;"; then
+	exit 0
+else
+	exit 1
+fi

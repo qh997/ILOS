@@ -1,0 +1,9 @@
+build/*
+cross-gcc-tmp/*
+cross-tool/*
+initramfs/*
+rootfs/*
+source/*
+sysroot/*
+env.sh
+*.tgz

@@ -1,0 +1,56 @@
+diff -uNr glibc-2.15/nptl/sysdeps/pthread/pt-initfini.c glibc-2.15_p/nptl/sysdeps/pthread/pt-initfini.c
+--- glibc-2.15/nptl/sysdeps/pthread/pt-initfini.c	2012-01-01 20:16:32.000000000 +0800
++++ glibc-2.15_p/nptl/sysdeps/pthread/pt-initfini.c	2014-05-07 14:50:07.692259028 +0800
+@@ -44,6 +44,10 @@
+ 
+ /* Embed an #include to pull in the alignment and .end directives. */
+ asm ("\n#include \"defs.h\"");
++asm ("\n#if defined __i686 && defined __ASSEMBLER__");
++asm ("\n#undef __i686");
++asm ("\n#define __i686 __i686");
++asm ("\n#endif");
+ 
+ /* The initial common code ends here. */
+ asm ("\n/*@HEADER_ENDS*/");
+diff -uNr glibc-2.15/sysdeps/i386/configure glibc-2.15_p/sysdeps/i386/configure
+--- glibc-2.15/sysdeps/i386/configure	2012-03-19 22:56:58.000000000 +0800
++++ glibc-2.15_p/sysdeps/i386/configure	2014-05-07 14:50:00.716258871 +0800
+@@ -632,7 +632,9 @@
+ done
+ 
+ 
+-ac_fn_c_check_header_mongrel "$LINENO" "cpuid.h" "ac_cv_header_cpuid_h" "$ac_includes_default"
++ac_fn_c_check_header_mongrel "$LINENO" "cpuid.h" "ac_cv_header_cpuid_h" "
++
++"
+ if test "x$ac_cv_header_cpuid_h" = xyes; then :
+ 
+ else
+diff -uNr glibc-2.15/sysdeps/i386/configure.in glibc-2.15_p/sysdeps/i386/configure.in
+--- glibc-2.15/sysdeps/i386/configure.in	2012-01-01 20:16:32.000000000 +0800
++++ glibc-2.15_p/sysdeps/i386/configure.in	2014-05-07 14:50:07.688259028 +0800
+@@ -2,7 +2,8 @@
+ # Local configure fragment for sysdeps/i386.
+ 
+ AC_HEADER_CHECK([cpuid.h], ,
+-  [AC_MSG_ERROR([gcc must provide the <cpuid.h> header])])
++  [AC_MSG_ERROR([gcc must provide the <cpuid.h> header])], [
++])
+ 
+ AC_CACHE_CHECK(if -g produces usable source locations for assembler-with-cpp,
+ 	       libc_cv_cpp_asm_debuginfo, [dnl
+diff -uNr glibc-2.15/sysdeps/unix/sysv/linux/i386/sysdep.h glibc-2.15_p/sysdeps/unix/sysv/linux/i386/sysdep.h
+--- glibc-2.15/sysdeps/unix/sysv/linux/i386/sysdep.h	2012-01-01 20:16:32.000000000 +0800
++++ glibc-2.15_p/sysdeps/unix/sysv/linux/i386/sysdep.h	2014-05-07 14:50:08.360259043 +0800
+@@ -28,7 +28,10 @@
+ /* Defines RTLD_PRIVATE_ERRNO and USE_DL_SYSINFO.  */
+ #include <dl-sysdep.h>
+ #include <tls.h>
+-
++#if defined __i686 && defined __ASSEMBLER__
++#undef __i686
++#define __i686 __i686
++#endif
+ 
+ /* For Linux we can use the system call table in the header file
+ 	/usr/include/asm/unistd.h

@@ -1,0 +1,5 @@
+#!/bin/bash
+mount -o remount, rw /dev/sda3 /
+
+export HOME=/root
+exec /bin/bash -l
